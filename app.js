@@ -1,16 +1,18 @@
 const express = require('express');
-
 const fs = require('fs');
+const morgan = require('morgan');
 
 const app = express();
 
+// 1. MIDDLEWARE
+app.use(morgan('dev'));
 app.use(express.json());
-
 app.use((req, res, next) => {
   console.log('Hello from middleware');
   next();
 });
 
+// 2. ROUTES HELPER
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
@@ -100,6 +102,7 @@ const deleteTour = (req, res) => {
 // app.patch('/api/v1/tours/:id', updateTour);
 // app.delete('/api/v1/tours/:id', deleteTour);
 
+// 3. ROUTES
 app.route('/api/v1/tours').get(getAllTours).post(createTour);
 app
   .route('/api/v1/tours/:id')
@@ -109,6 +112,7 @@ app
 
 const port = 3000;
 
+// 4. SERVER STARTING
 app.listen(port, () => {
   console.log('app is listening at post ' + port);
 });
