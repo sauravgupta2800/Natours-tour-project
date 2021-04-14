@@ -1,43 +1,13 @@
 const express = require('express');
+const controller = require('../controller/userController');
 
 const router = express.Router();
 
-const getAllUsers = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route not yet defailed !',
-  });
-};
-
-const createUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route not yet defailed !',
-  });
-};
-
-const getUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route not yet defailed !',
-  });
-};
-
-const updateUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route not yet defailed !',
-  });
-};
-
-const deleteUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route not yet defailed !',
-  });
-};
-
-router.route('/').get(getAllUsers).post(createUser);
-router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
+router.route('/').get(controller.getAllUsers).post(controller.createUser);
+router
+  .route('/:id')
+  .get(controller.getUser)
+  .patch(controller.updateUser)
+  .delete(controller.deleteUser);
 
 module.exports = router;
