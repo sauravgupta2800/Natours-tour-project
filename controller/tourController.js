@@ -85,3 +85,58 @@ exports.deleteTour = async (req, res) => {
     });
   }
 };
+
+exports.tourStats = async (req, res) => {
+  //https://docs.mongodb.com/manual/aggregation/
+  try {
+    const stats = await Tour.aggregate([
+      {
+        $match: {
+          ratingsAverage: { $gte: 4.5 },
+        },
+      },
+      {
+        $group: {
+          _id: { $toUpper: '$difficulty' },
+          numTours: {
+            $sum: 1,
+          },
+          numRatings: {
+            $sum: '$ratingsQuantity',
+          },
+          avgRatings: {
+            $avg: '$ratingsQuantity',
+          },
+          avgPrice: {
+            $avg: '$price',
+          },
+          minPrice: {
+            $min: '$price',
+          },
+          maxPrice: {
+            $max: '$price',
+          },
+        },
+      },
+      {
+        $sort: {
+          avgPrice: 1,
+        },
+      },
+      // {
+      //   $match: {
+      //     _id: { $ne: 'EASY' },
+      //   },
+      // },
+    ]);
+    res.status(200).json({
+      status: 'success',
+      data: { stats },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: 'Invalid data',
+    });
+  }
+};
