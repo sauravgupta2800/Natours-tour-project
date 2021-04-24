@@ -1,5 +1,12 @@
 const AppError = require('../utils/appError');
 
+const handleValidationErrorDB = (err) => {
+  const errors = Object.keys(err.errors).map(
+    (name) => err.errors[name].message
+  );
+  const message = `Invalid Input Data. ${errors.join('. ')}`;
+  return new AppError(message, 400);
+};
 const handleCastErrDB = (err) => {
   const message = `Invalid ${err.path}: ${err.value}`;
   return new AppError(message, 400);
@@ -26,8 +33,6 @@ const sendErrorProd = (err, res) => {
     res.status(err.statusCode).json({
       status: err.status,
       message: err.message,
-      error: err,
-      stack: err.stack,
     });
   } else {
     // send generic message
@@ -41,12 +46,14 @@ const sendErrorProd = (err, res) => {
 module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
+  console.log('process.env.NODE_ENV', process.env.NODE_ENV);
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
     if (error.name === 'CastError') error = handleCastErrDB(error);
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);
+    if (err.name === 'ValidationError') error = handleValidationErrorDB(error);
 
     sendErrorProd(error, res);
   }
