@@ -25,6 +25,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide confirm password'],
     minlength: 8,
+    validate: {
+      // This only works on CREATE & SAVE,
+      // WILL NOT WORK ON PASSWORD UPDATE
+      validator: function (val) {
+        return val === this.password;
+      },
+      message: 'Passwords are not same',
+    },
   },
 });
 
